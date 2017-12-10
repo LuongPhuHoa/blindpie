@@ -15,7 +15,7 @@ _ref_resp_time = None   # Average time of a response from the page.
 _time_to_sleep = None   # Time to sleep during the injections.
 _threads = None         # Number of threads to create when getting multiple rows.
 
-MAX_ROW_LENGTH = 64     # Max number of characters of a row.
+MAX_ROW_LENGTH = 128    # Max number of characters of a row.
 
 _bool_injections = {    # Injections to detect a character or the length of a row.
     "unquoted": {
@@ -77,6 +77,8 @@ def _init_ref_resp_time():
     for _ in range(10):
         results.append(pool.apply_async(_get_resp_time, [_payload]))
 
+    pool.close()
+
     for r in results:
         times.append(r.get())
 
@@ -136,6 +138,8 @@ def _get_char(row, index):
 
         gt_result = pool.apply_async(_get_resp_time, [params])
 
+        pool.close()
+
         # Check if the first test is true:
         eq_time = eq_result.get()
 
@@ -188,6 +192,8 @@ def _get_row_length(row):
             results.append(pool.apply_async(_get_resp_time, [params]))
             _delay()
             test_length += 1
+
+        pool.close()
 
         for j in range(len(results)):
             # When the length is found, break the loop.
@@ -251,7 +257,17 @@ def _get_rows(row, rows):
         for r in results:
             values.append(r.get())
 
+        pool.close()
+
         print('(%.3f sec)' % (datetime.now() - time).total_seconds())
+
+        if rows > _threads:
+            print('> RESULTS (as far):')
+            for v in values:
+                if v == '':
+                    print('[empty]')
+                else:
+                    print(v)
 
     print('> RESULTS:')
     for v in values:
