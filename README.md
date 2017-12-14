@@ -138,7 +138,7 @@ Zaphod
 
 Note #1: use the `-M` parameter to set the reliability of the script. The value goes from 0 (the least reliable but the fastest) to 3 (the most reliable but the slowest).
 
-Note #2: use the `-T` parameter to set the number of rows to extract concurrently.
+Note #2: use the `-T` parameter to set the number of rows to extract concurrently. <strong>Multithreading is suggested during local analysis only. It seems to be less reliable for non local targets.</strong>
 
 The script will test each character of each row and will print the rows found.
 

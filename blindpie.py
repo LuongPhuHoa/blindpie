@@ -106,7 +106,7 @@ def _init_sleep_time():
 # Returns the character at index 'index', or None if not found.
 def _get_char(row, index):
 
-    (min_index, mid_index, max_index) = (0, None, 127)
+    (min_index, mid_index, max_index) = (32, None, 126)
 
     # Copy the payload in a temporary dictionary.
     params = dict(_payload)
@@ -474,7 +474,7 @@ _method = 'post' if args.post else 'get'
 if 'T' in args and args.T is not None:
     _threads = args.T
 else:
-    _threads = 2
+    _threads = 1
 if 'M' in args and args.M is not None:
     _mode = args.M
 else:
