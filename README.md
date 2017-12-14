@@ -3,6 +3,8 @@
 `blindpie` is a simple Python script to automate time-based blind SQL injections.<br>
 It should work fine injecting in SELECT, DELETE, and UPDATE queries. Injections in INSERT queries are supported only for parameters which are unquoted (numeric values).
 
+![Demo](/demo/demo.gif)
+
 ## Usage
 
 Use the `--help` command to show the help message:
