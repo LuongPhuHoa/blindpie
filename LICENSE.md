@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2017 Alessio Vierti
+Copyright (c) 2018 Alessio Vierti
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
