@@ -14,15 +14,15 @@
 </p>
 
 <p align="center">
-	[Installation](#installation) •
-	[Features](#features) •
-	[Usage](#usage) •
-	[Examples](#examples) •
-	[Tips](#tips) •
-	[Contributing](#contributing)
+	<a href="#installation">Installation</a> •
+	<a href="#features">Features</a> •
+	<a href="#usage">Usage</a> •
+	<a href="#examples">Examples</a> •
+	<a href="#tips">Tips</a> •
+	<a href="#contributing">Contributing</a>
 </p>
 
-<div align="center">![Demo Long Fetch](https://i.imgur.com/tfMaLG9.gif)</div>
+<img align="center" src="https://i.imgur.com/tfMaLG9.gif" alt="Demo Long Fetch">
 
 ### Installation
 
@@ -43,7 +43,7 @@ pip install blindpie
 
 <h4 align="center">Testing parameters</h4><p></p>
 
-<div align="center">![Demo Test](https://i.imgur.com/0D9Zyx0.gif)</div>
+<img align="center" src="https://i.imgur.com/0D9Zyx0.gif" alt="Demo Test">
 
 ```
 usage: blindpie.py test [-h] -M method -P params [-H headers] [-T threshold]
@@ -68,7 +68,7 @@ optional arguments:
 
 <h4 align="center">Fetching a table</h4><p></p>
 
-<div align="center">![Demo Short Fetch](https://i.imgur.com/ubsFh8M.gif)</div>
+<img align="center" src="https://i.imgur.com/ubsFh8M.gif" alt="Demo Short Fetch">
 
 ```
 usage: blindpie.py fetch_table [-h] -M method -P params [-H headers]
