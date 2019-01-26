@@ -1,5 +1,5 @@
 <h1 align="center">
-	<br>blindpie<br>
+	<img src="https://i.imgur.com/xPTh4OJ.png" alt="blindpie" width="25%">
 </h1>
 
 <h4 align="center">Automatically exploit blind-SQLi vulnerabilities</h4>
@@ -10,6 +10,9 @@
 	</a>
 	<a href="https://travis-ci.org/alessiovierti/blindpie">
 		<img src="https://travis-ci.org/alessiovierti/blindpie.svg?branch=master">
+	</a>
+	<a href="LICENSE.md">
+		<img src="https://img.shields.io/badge/license-MIT-blue.svg">	
 	</a>
 </p>
 
@@ -172,6 +175,7 @@ If you wanna play with it or extend it use the `Makefile` to install the require
 ### Authors
 
 * **Alessio Vierti** - *Initial work*
+* [@gabrielevierti](https://github.com/gabrielevierti) - *Logo*
 
 ### License
 
