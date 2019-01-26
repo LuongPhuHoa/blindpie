@@ -1,0 +1,10 @@
+.DS_Store
+.idea
+*.mdj
+.cache
+blindpie.egg-info
+dist
+build
+dist
+MANIFEST
+*.pyc

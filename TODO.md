@@ -1,0 +1,3 @@
+- Catch when the target is unavailable in a clean way when testing or fetching.
+- **BUG:** `_reduce_range` with more than 2 threads seems to loop indefinitely.
+- Make the reference time a dynamic (adaptive) model.
