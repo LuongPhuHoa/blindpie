@@ -22,7 +22,9 @@
 	<a href="#contributing">Contributing</a>
 </p>
 
-<img align="center" src="https://i.imgur.com/tfMaLG9.gif" alt="Demo Long Fetch">
+<p align="center">
+	<img src="https://i.imgur.com/tfMaLG9.gif" alt="Demo Long Fetch">
+</p>
 
 ### Installation
 
@@ -43,7 +45,9 @@ pip install blindpie
 
 <h4 align="center">Testing parameters</h4><p></p>
 
-<img align="center" src="https://i.imgur.com/0D9Zyx0.gif" alt="Demo Test">
+<p align="center">
+	<img src="https://i.imgur.com/0D9Zyx0.gif" alt="Demo Test">
+</p>
 
 ```
 usage: blindpie.py test [-h] -M method -P params [-H headers] [-T threshold]
@@ -68,7 +72,9 @@ optional arguments:
 
 <h4 align="center">Fetching a table</h4><p></p>
 
-<img align="center" src="https://i.imgur.com/ubsFh8M.gif" alt="Demo Short Fetch">
+<p align="center">
+	<img align="center" src="https://i.imgur.com/ubsFh8M.gif" alt="Demo Short Fetch">
+</p>
 
 ```
 usage: blindpie.py fetch_table [-h] -M method -P params [-H headers]
