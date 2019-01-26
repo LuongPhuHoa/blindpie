@@ -8,8 +8,8 @@
 	<a href="https://github.com/alessiovierti/blindpie/releases">
 		<img src="https://img.shields.io/github/release/alessiovierti/blindpie.svg">
 	</a>
-	<a href="https://travis-ci.com/alessiovierti/blindpie">
-		<img src="https://img.shields.io/travis/com/alessiovierti/blindpie.svg">
+	<a href="https://travis-ci.org/alessiovierti/blindpie">
+		<img src="https://travis-ci.org/alessiovierti/blindpie.svg?branch=master">
 	</a>
 </p>
 
